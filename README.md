@@ -4,7 +4,7 @@
 
 PersonaFlow is a design-time, canvas-first tool where engineers can map agents, tools, memory, and human checkpoints to visualize and reason about multi-agent AI architectures before implementation.
 
-![PersonaFlow Editor](https://via.placeholder.com/800x450?text=PersonaFlow+Editor)
+<img src="src/assets/PersonaFlowEditor.png" alt="PersonaFlow Editor" style="border-radius: 12px; max-width: 100%; height: auto;" />
 
 ## Features
 
