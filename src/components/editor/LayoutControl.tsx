@@ -9,7 +9,7 @@ interface LayoutControlProps {
   direction?: LayoutDirection;
 }
 
-export function LayoutControl({ direction = 'TB' }: LayoutControlProps) {
+export function LayoutControl({ direction }: LayoutControlProps) {
   const { getNodes, setNodes, fitView } = useReactFlow();
   const [, setNodesAtom] = useAtom(nodesAtom);
   const [edges] = useAtom(edgesAtom);
@@ -18,7 +18,7 @@ export function LayoutControl({ direction = 'TB' }: LayoutControlProps) {
     // Get current nodes from React Flow (they may have been moved)
     const currentNodes = getNodes() as PersonaNode[];
     
-    // Apply layout
+    // Apply layout (auto-detects optimal direction if not provided)
     const layoutedNodes = applyAgentSystemLayout(currentNodes, edges, direction);
     
     // Update nodes in both React Flow and Jotai
@@ -34,8 +34,8 @@ export function LayoutControl({ direction = 'TB' }: LayoutControlProps) {
   return (
     <ControlButton
       onClick={handleLayout}
-      title="Auto-layout graph (TB)"
-      aria-label="Auto-layout graph"
+      title="Smart auto-layout graph"
+      aria-label="Smart auto-layout graph"
     >
       <Wand2 className="w-4 h-4" />
     </ControlButton>

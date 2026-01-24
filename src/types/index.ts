@@ -137,3 +137,28 @@ export function isAgentType(type: PersonaNodeType): boolean {
 export function generateId(): string {
   return `node_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`;
 }
+
+// Export types for serialization
+export interface ExportNode {
+  id: string;
+  type: PersonaNodeType;
+  name: string;
+  position: { x: number; y: number };
+  meta: PersonaNodeMeta;
+}
+
+export interface ExportEdge {
+  id: string;
+  source: string;
+  target: string;
+  label?: string;
+  animated?: boolean;
+}
+
+export interface PersonaFlowExport {
+  version: string;
+  exportedAt?: string; // ISO 8601
+  name?: string;
+  nodes: ExportNode[];
+  edges: ExportEdge[];
+}
