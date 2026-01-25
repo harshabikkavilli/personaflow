@@ -65,7 +65,7 @@ export function AppLayout() {
 										<Link
 											key={item.name}
 											to={item.href}
-											className={`text-lg font-medium ${
+											className={`text-md font-medium ${
 												isActive
 													? 'gradient-primary-text'
 													: 'text-gray-400 hover:text-white'

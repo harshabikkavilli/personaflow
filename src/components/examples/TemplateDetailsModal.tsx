@@ -1,33 +1,22 @@
-import {useSetAtom} from 'jotai';
 import {
-	Brain,
-	Database,
-	ExternalLink,
-	FileSearch,
-	GitBranch,
-	Play,
-	Shield,
-	Sparkles,
-	User,
-	Wrench,
-	X
-} from 'lucide-react';
-import {useCallback, useEffect} from 'react';
+	Background,
+	BackgroundVariant,
+	Controls,
+	MarkerType,
+	ReactFlow,
+	ReactFlowProvider
+} from '@xyflow/react';
+import '@xyflow/react/dist/style.css';
+import {useSetAtom} from 'jotai';
+import {ExternalLink, Sparkles, X} from 'lucide-react';
+import {useCallback, useEffect, useMemo} from 'react';
 import {selectedTemplateModalAtom} from '../../atoms/examplesAtoms';
 import {difficultyColors, frameworkColors} from '../../constants/examples';
 import type {ExampleGraph} from '../../data/examples';
-import type {PersonaNodeType} from '../../types';
+import type {PersonaEdge, PersonaNode, PersonaNodeType} from '../../types';
 import {getNodeConfig} from '../../types';
-
-const nodeTypeIcons: Record<PersonaNodeType, typeof Brain> = {
-	planner: Brain,
-	executor: Play,
-	critic: Shield,
-	router: GitBranch,
-	tool: Wrench,
-	memory: Database,
-	humanCheckpoint: User
-};
+import {edgeTypes} from '../editor/edges/edgeTypes';
+import {nodeTypes} from '../editor/nodes/nodeTypes';
 
 const nodeTypeLabels: Record<PersonaNodeType, string> = {
 	planner: 'Planner',
@@ -37,6 +26,48 @@ const nodeTypeLabels: Record<PersonaNodeType, string> = {
 	tool: 'Tool',
 	memory: 'Memory',
 	humanCheckpoint: 'Human'
+};
+
+// Read-only React Flow preview component
+interface GraphPreviewProps {
+	nodes: PersonaNode[];
+	edges: PersonaEdge[];
+}
+
+const GraphPreview = ({nodes, edges}: GraphPreviewProps) => {
+	return (
+		<ReactFlow
+			nodes={nodes}
+			edges={edges}
+			nodeTypes={nodeTypes}
+			edgeTypes={edgeTypes}
+			fitView
+			fitViewOptions={{padding: 0.2, maxZoom: 1.5}}
+			// Disable all interactions for read-only mode
+			nodesDraggable={false}
+			nodesConnectable={false}
+			elementsSelectable={false}
+			panOnDrag={true}
+			zoomOnScroll={true}
+			zoomOnPinch={true}
+			panOnScroll={false}
+			selectNodesOnDrag={false}
+			// Styling
+			defaultEdgeOptions={{
+				type: 'smoothstep',
+				style: {stroke: '#666666', strokeWidth: 2},
+				markerEnd: {type: MarkerType.ArrowClosed, color: '#666666'}
+			}}
+			proOptions={{hideAttribution: true}}>
+			<Background
+				variant={BackgroundVariant.Dots}
+				gap={16}
+				size={1}
+				color='var(--pf-border)'
+			/>
+			<Controls showZoom showFitView showInteractive={false} />
+		</ReactFlow>
+	);
 };
 
 interface TemplateDetailsModalProps {
@@ -68,131 +99,9 @@ export function TemplateDetailsModal({
 		};
 	}, [handleClose]);
 
-	// Render graph visualization
-	const renderGraphVisualization = () => {
-		// For now, render a simplified version based on example ID
-		// In a full implementation, you'd parse the actual nodes/edges
-		if (example.id === 'agentic-rag') {
-			return (
-				<div className='relative w-full h-full flex items-center justify-center p-12'>
-					<svg
-						className='absolute inset-0 w-full h-full pointer-events-none'
-						xmlns='http://www.w3.org/2000/svg'>
-						<defs>
-							<marker
-								id='arrowhead'
-								markerHeight='7'
-								markerWidth='10'
-								orient='auto'
-								refX='9'
-								refY='3.5'>
-								<polygon fill='#4b5563' points='0 0, 10 3.5, 0 7' />
-							</marker>
-						</defs>
-						<path
-							d='M 300 350 L 400 350'
-							fill='none'
-							markerEnd='url(#arrowhead)'
-							stroke='#4b5563'
-							strokeWidth='1.5'
-						/>
-						<path
-							d='M 520 350 L 620 350'
-							fill='none'
-							markerEnd='url(#arrowhead)'
-							stroke='#4b5563'
-							strokeWidth='1.5'
-						/>
-						<path
-							d='M 740 350 L 840 350'
-							fill='none'
-							markerEnd='url(#arrowhead)'
-							stroke='#4b5563'
-							strokeWidth='1.5'
-						/>
-						<path
-							d='M 890 310 C 890 200, 460 200, 460 310'
-							fill='none'
-							markerEnd='url(#arrowhead)'
-							stroke='#6366f1'
-							strokeDasharray='4 4'
-							strokeWidth='2'
-						/>
-					</svg>
-					<div className='flex items-center gap-24 relative z-10'>
-						<div className='flex flex-col items-center gap-3'>
-							<div className='w-32 h-20 bg-[#1e1e1e] border border-[var(--pf-border)] rounded-xl flex flex-col items-center justify-center gap-2 shadow-lg shadow-black/40'>
-								<GitBranch className='w-6 h-6 text-amber-400' />
-								<span className='text-xs font-semibold tracking-wider uppercase text-[var(--pf-text-secondary)]'>
-									Router
-								</span>
-							</div>
-						</div>
-						<div className='flex flex-col items-center gap-3'>
-							<div className='w-32 h-20 bg-[#1e1e1e] border border-[var(--pf-border)] rounded-xl flex flex-col items-center justify-center gap-2 shadow-lg shadow-black/40'>
-								<FileSearch className='w-6 h-6 text-blue-400' />
-								<span className='text-xs font-semibold tracking-wider uppercase text-[var(--pf-text-secondary)]'>
-									Retriever
-								</span>
-							</div>
-						</div>
-						<div className='flex flex-col items-center gap-3'>
-							<div className='w-32 h-20 bg-[#1e1e1e] border-2 border-[var(--pf-primary-gradient)]/50 rounded-xl flex flex-col items-center justify-center gap-2 shadow-lg shadow-[var(--pf-primary-gradient)]/10 ring-4 ring-[var(--pf-primary-gradient)]/5'>
-								<Shield className='w-6 h-6 text-[var(--pf-primary-gradient)]' />
-								<span className='text-xs font-semibold tracking-wider uppercase text-[var(--pf-text-secondary)]'>
-									Critic
-								</span>
-							</div>
-							<span className='text-[10px] text-[var(--pf-primary-gradient)] font-bold animate-pulse'>
-								SELF-CORRECTION
-							</span>
-						</div>
-						<div className='flex flex-col items-center gap-3'>
-							<div className='w-32 h-20 bg-[#1e1e1e] border border-[var(--pf-border)] rounded-xl flex flex-col items-center justify-center gap-2 shadow-lg shadow-black/40'>
-								<Play className='w-6 h-6 text-emerald-400' />
-								<span className='text-xs font-semibold tracking-wider uppercase text-[var(--pf-text-secondary)]'>
-									Executor
-								</span>
-							</div>
-						</div>
-					</div>
-					<div className='absolute bottom-8 left-8 flex items-center gap-2 bg-black/40 px-3 py-1.5 rounded-lg border border-white/5 backdrop-blur-md'>
-						<span className='w-2 h-2 rounded-full bg-emerald-500'></span>
-						<span className='text-[10px] font-medium text-[var(--pf-text-secondary)]'>
-							High-Fidelity Preview • Live Editor v2.4
-						</span>
-					</div>
-				</div>
-			);
-		}
-
-		// Default visualization
-		return (
-			<div className='flex items-center justify-center gap-8 p-12'>
-				{example.nodeTypes.slice(0, 4).map((type, idx) => {
-					const Icon = nodeTypeIcons[type as PersonaNodeType] || GitBranch;
-					const config = getNodeConfig(type as PersonaNodeType);
-					const color = config?.color || '#6366f1';
-
-					return (
-						<div key={idx} className='flex flex-col items-center gap-3'>
-							<div
-								className='w-32 h-20 bg-[#1e1e1e] border border-[var(--pf-border)] rounded-xl flex flex-col items-center justify-center gap-2 shadow-lg shadow-black/40'
-								style={{
-									borderColor: idx === 2 ? `${color}50` : undefined,
-									borderWidth: idx === 2 ? '2px' : '1px'
-								}}>
-								<Icon className='w-6 h-6' style={{color}} />
-								<span className='text-xs font-semibold tracking-wider uppercase text-[var(--pf-text-secondary)]'>
-									{nodeTypeLabels[type as PersonaNodeType] || type}
-								</span>
-							</div>
-						</div>
-					);
-				})}
-			</div>
-		);
-	};
+	// Memoize nodes and edges to prevent unnecessary re-renders
+	const flowNodes = useMemo(() => example.nodes, [example.nodes]);
+	const flowEdges = useMemo(() => example.edges, [example.edges]);
 
 	return (
 		<div
@@ -239,8 +148,10 @@ export function TemplateDetailsModal({
 					{/* Content */}
 					<div className='flex-1 flex flex-col lg:flex-row overflow-hidden'>
 						{/* Graph Preview */}
-						<div className='flex-1 bg-[#0d0d0d] graph-preview-dots relative overflow-hidden flex items-center justify-center min-h-[300px] border-b lg:border-b-0 lg:border-r border-[var(--pf-border)]'>
-							{renderGraphVisualization()}
+						<div className='flex-1 bg-[#0d0d0d] graph-preview-dots relative overflow-hidden min-h-[300px] border-b lg:border-b-0 lg:border-r border-[var(--pf-border)]'>
+							<ReactFlowProvider>
+								<GraphPreview nodes={flowNodes} edges={flowEdges} />
+							</ReactFlowProvider>
 						</div>
 
 						{/* Details Panel */}
@@ -315,8 +226,10 @@ export function TemplateDetailsModal({
 
 					{/* Footer */}
 					<div className='px-6 py-4 gap-3 bg-[var(--pf-bg-secondary)] border-t border-[var(--pf-border)] flex items-center justify-end flex-shrink-0'>
-						<button className='px-4 py-2 text-sm font-medium bg-[var(--pf-bg-tertiary)] hover:bg-[var(--pf-border)] transition-colors rounded-md text-[var(--pf-text-primary)]'>
-							Clone Template
+						<button
+							onClick={handleClose}
+							className='px-4 py-2 text-sm font-medium bg-[var(--pf-bg-tertiary)] hover:bg-[var(--pf-border)] transition-colors rounded-md text-[var(--pf-text-primary)]'>
+							Cancel
 						</button>
 						<button
 							onClick={onOpenInEditor}
