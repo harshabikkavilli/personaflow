@@ -1,4 +1,4 @@
-import {useAtomValue} from 'jotai';
+import {useAtomValue, useSetAtom} from 'jotai';
 import {
 	AlertTriangle,
 	Bot,
@@ -13,37 +13,33 @@ import {
 	statsAtom,
 	warningsAtom
 } from '../../atoms/graphAtoms';
+import {
+	toggleLeftSidebarAtom,
+	toggleDetailsPanelAtom,
+	openWarningsPanelAtom,
+	openExportModalAtom
+} from '../../atoms/uiAtoms';
 
-interface TopStripProps {
-	onToggleLeftSidebar?: () => void;
-	onToggleDetailsPanel?: () => void;
-	onOpenWarnings?: () => void;
-	onOpenExport?: () => void;
-}
-
-export function TopStrip({
-	onToggleLeftSidebar,
-	onToggleDetailsPanel,
-	onOpenWarnings,
-	onOpenExport
-}: TopStripProps) {
+export function TopStrip() {
 	const stats = useAtomValue(statsAtom);
 	const warnings = useAtomValue(warningsAtom);
 	const isValid = useAtomValue(isValidSystemAtom);
+	const toggleLeftSidebar = useSetAtom(toggleLeftSidebarAtom);
+	const toggleDetailsPanel = useSetAtom(toggleDetailsPanelAtom);
+	const openWarnings = useSetAtom(openWarningsPanelAtom);
+	const openExport = useSetAtom(openExportModalAtom);
 
 	return (
 		<div className='flex items-center justify-between px-2 sm:px-4 h-10 sm:h-10 border-b border-[var(--pf-border)] bg-[var(--pf-bg-secondary)]'>
 			{/* Left side: Mobile menu button, Workspace name and stats */}
 			<div className='flex items-center gap-2 sm:gap-6 flex-1 min-w-0'>
 				{/* Mobile menu button */}
-				{onToggleLeftSidebar && (
-					<button
-						onClick={onToggleLeftSidebar}
-						className='lg:hidden p-1.5 rounded hover:bg-[var(--pf-bg-tertiary)] text-[var(--pf-text-secondary)] hover:text-[var(--pf-text-primary)] transition-colors'
-						aria-label='Toggle components sidebar'>
-						<Menu className='w-4 h-4' />
-					</button>
-				)}
+				<button
+					onClick={() => toggleLeftSidebar()}
+					className='lg:hidden p-1.5 rounded hover:bg-[var(--pf-bg-tertiary)] text-[var(--pf-text-secondary)] hover:text-[var(--pf-text-primary)] transition-colors'
+					aria-label='Toggle components sidebar'>
+					<Menu className='w-4 h-4' />
+				</button>
 
 				<span className='text-xs sm:text-sm font-medium text-[var(--pf-text-primary)] hidden sm:inline'>
 					Workspace
@@ -71,19 +67,17 @@ export function TopStrip({
 			{/* Right side: Export, Warnings, validation status, and details toggle */}
 			<div className='flex items-center gap-2 sm:gap-4 flex-shrink-0'>
 				{/* Export button */}
-				{onOpenExport && (
-					<button
-						onClick={onOpenExport}
-						className='flex items-center gap-1 sm:gap-1.5 px-2 sm:px-3 py-1 rounded bg-[var(--pf-bg-tertiary)] text-[var(--pf-text-secondary)] hover:text-[var(--pf-text-primary)] hover:bg-[var(--pf-bg-tertiary)] transition-colors border border-[var(--pf-border)]'
-						aria-label='Export code'>
-						<Download className='w-3 h-3 sm:w-3.5 sm:h-3.5' />
-						<span className='text-xs font-medium hidden sm:inline'>Export</span>
-					</button>
-				)}
+				<button
+					onClick={() => openExport()}
+					className='flex items-center gap-1 sm:gap-1.5 px-2 sm:px-3 py-1 rounded bg-[var(--pf-bg-tertiary)] text-[var(--pf-text-secondary)] hover:text-[var(--pf-text-primary)] hover:bg-[var(--pf-bg-tertiary)] transition-colors border border-[var(--pf-border)]'
+					aria-label='Export code'>
+					<Download className='w-3 h-3 sm:w-3.5 sm:h-3.5' />
+					<span className='text-xs font-medium hidden sm:inline'>Export</span>
+				</button>
 
 				{warnings.length > 0 && (
 					<button
-						onClick={onOpenWarnings}
+						onClick={() => openWarnings()}
 						className='flex items-center gap-1 sm:gap-1.5 px-1.5 sm:px-2 py-1 rounded bg-[var(--pf-warning)]/10 text-[var(--pf-warning)] hover:bg-[var(--pf-warning)]/20 transition-colors cursor-pointer'
 						aria-label='View warnings'>
 						<AlertTriangle className='w-3 h-3 sm:w-3.5 sm:h-3.5' />
@@ -111,15 +105,13 @@ export function TopStrip({
 					</span>
 				</div>
 
-				{/* Mobile details toggle button - only show if there's a way to open it */}
-				{onToggleDetailsPanel && (
-					<button
-						onClick={onToggleDetailsPanel}
-						className='lg:hidden p-1.5 rounded hover:bg-[var(--pf-bg-tertiary)] text-[var(--pf-text-secondary)] hover:text-[var(--pf-text-primary)] transition-colors'
-						aria-label='Toggle details panel'>
-						<Menu className='w-4 h-4' />
-					</button>
-				)}
+				{/* Mobile details toggle button */}
+				<button
+					onClick={() => toggleDetailsPanel()}
+					className='lg:hidden p-1.5 rounded hover:bg-[var(--pf-bg-tertiary)] text-[var(--pf-text-secondary)] hover:text-[var(--pf-text-primary)] transition-colors'
+					aria-label='Toggle details panel'>
+					<Menu className='w-4 h-4' />
+				</button>
 			</div>
 		</div>
 	);

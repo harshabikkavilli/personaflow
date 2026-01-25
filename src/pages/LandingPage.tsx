@@ -1,11 +1,4 @@
 import {
-	Background,
-	BackgroundVariant,
-	ReactFlow,
-	ReactFlowProvider
-} from '@xyflow/react';
-import '@xyflow/react/dist/style.css';
-import {
 	ArrowRight,
 	CheckCircle,
 	Github,
@@ -17,9 +10,9 @@ import {
 	Users,
 	Workflow
 } from 'lucide-react';
+import {ReactFlowProvider} from '@xyflow/react';
 import {Link} from 'react-router-dom';
-import {edgeTypes} from '../components/editor/edges/edgeTypes';
-import {nodeTypes} from '../components/editor/nodes/nodeTypes';
+import {GraphPreview} from '../components/ui/GraphPreview';
 import {defaultExample, examples} from '../data/examples';
 
 // Featured templates to showcase
@@ -32,30 +25,13 @@ const featuredTemplates = [
 // Read-only React Flow preview component for hero section
 const HeroGraphPreview = () => {
 	return (
-		<ReactFlow
+		<GraphPreview
 			nodes={defaultExample.nodes}
 			edges={defaultExample.edges}
-			nodeTypes={nodeTypes}
-			edgeTypes={edgeTypes}
-			fitView
+			height="500px"
 			fitViewOptions={{padding: 0.15, maxZoom: 1.1, minZoom: 0.5}}
-			// Disable all interactions for read-only mode
-			nodesDraggable={false}
-			nodesConnectable={false}
-			elementsSelectable={false}
-			panOnDrag={false}
-			zoomOnScroll={false}
-			zoomOnPinch={false}
-			panOnScroll={false}
-			selectNodesOnDrag={false}
-			proOptions={{hideAttribution: true}}>
-			<Background
-				variant={BackgroundVariant.Dots}
-				gap={16}
-				size={1}
-				color='var(--pf-border)'
-			/>
-		</ReactFlow>
+			interactive={false}
+		/>
 	);
 };
 

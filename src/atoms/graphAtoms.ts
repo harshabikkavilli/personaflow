@@ -12,7 +12,20 @@ export const selectedNodeIdAtom = atom<string | null>(null);
 export const selectedNodeAtom = atom((get) => {
   const id = get(selectedNodeIdAtom);
   if (!id) return null;
-  return get(nodesAtom).find((n) => n.id === id) ?? null;
+  const nodes = get(nodesAtom);
+  return nodes.find((n) => n.id === id) ?? null;
+});
+
+// Derived atom factory: get node by ID
+export const nodeByIdAtom = (id: string) => atom((get) => {
+  const nodes = get(nodesAtom);
+  return nodes.find((n) => n.id === id) ?? null;
+});
+
+// Derived atom factory: get edge by ID
+export const edgeByIdAtom = (id: string) => atom((get) => {
+  const edges = get(edgesAtom);
+  return edges.find((e) => e.id === id) ?? null;
 });
 
 // Derived atom: compute warnings from the graph
@@ -125,3 +138,6 @@ export const clearGraphAtom = atom(null, (_get, set) => {
   set(edgesAtom, []);
   set(selectedNodeIdAtom, null);
 });
+
+// Atom to track if default example has been loaded
+export const hasLoadedDefaultAtom = atom<boolean>(false);

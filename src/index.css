@@ -23,6 +23,7 @@
 	--pf-success: #22c55e;
 	--pf-warning: #f59e0b;
 	--pf-error: #ef4444;
+	--pf-info: #6b7280;
 
 	/* Primary gradient */
 	/* --pf-primary-gradient: linear-gradient(135deg, #8b5cf6, #3b82f6, #6366f1); */
@@ -213,7 +214,9 @@ body {
 
 /* Smooth edge transitions */
 .react-flow__edge path {
-	transition: stroke-width 0.2s ease, opacity 0.2s ease;
+	transition:
+		stroke-width 0.2s ease,
+		opacity 0.2s ease;
 }
 
 /* Primary gradient utilities */

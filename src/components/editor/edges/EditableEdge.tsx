@@ -5,33 +5,17 @@ import {
 	type EdgeProps
 } from '@xyflow/react';
 import {useAtomValue, useSetAtom} from 'jotai';
-import {edgesAtom, nodesAtom, updateEdgeAtom} from '../../../atoms/graphAtoms';
-import {EdgeLabelEditor} from '../EdgeLabelEditor';
+import {useMemo} from 'react';
+import {edgeByIdAtom, nodeByIdAtom, updateEdgeAtom} from '../../../atoms/graphAtoms';
+import {EdgeLabelEditor} from './EdgeLabelEditor';
+import {nodeTypeColors} from '../../../constants/nodeConstants';
+import {hexToRgba} from '../../../utils/colorUtils';
 import type {PersonaEdge, PersonaNodeType} from '../../../types';
-
-// Color mapping for node types (hex values)
-const nodeTypeColors: Record<PersonaNodeType, string> = {
-	planner: '#3b82f6',
-	executor: '#f97316',
-	critic: '#a855f7',
-	router: '#eab308',
-	tool: '#6b7280',
-	memory: '#14b8a6',
-	humanCheckpoint: '#ec4899'
-};
 
 // Helper to get edge color based on source node type
 function getEdgeColor(sourceNodeType?: PersonaNodeType): string {
 	if (!sourceNodeType) return '#666666';
 	return nodeTypeColors[sourceNodeType] || '#666666';
-}
-
-// Helper to convert hex to rgba with opacity
-function hexToRgba(hex: string, opacity: number): string {
-	const r = parseInt(hex.slice(1, 3), 16);
-	const g = parseInt(hex.slice(3, 5), 16);
-	const b = parseInt(hex.slice(5, 7), 16);
-	return `rgba(${r}, ${g}, ${b}, ${opacity})`;
 }
 
 export function EditableEdge(props: EdgeProps) {
@@ -50,17 +34,17 @@ export function EditableEdge(props: EdgeProps) {
 		markerEnd
 	} = props;
 	const updateEdge = useSetAtom(updateEdgeAtom);
-	const nodes = useAtomValue(nodesAtom);
-	const edges = useAtomValue(edgesAtom);
-
-	// Get the edge object to check for animated property
-	const edgeObj = edges.find((e) => e.id === id);
+	
+	// Use derived atoms for efficient lookups
+	const edgeAtom = useMemo(() => edgeByIdAtom(id), [id]);
+	const edgeObj = useAtomValue(edgeAtom);
 	const isAnimated = edgeObj?.animated || false;
 
 	// Get source node to determine edge color
-	const sourceNode = nodes.find((n) => n.id === source);
+	const sourceNodeAtom = useMemo(() => nodeByIdAtom(source || ''), [source]);
+	const sourceNode = useAtomValue(sourceNodeAtom);
 	const sourceNodeType = sourceNode?.data?.personaType;
-	const edgeColor = getEdgeColor(sourceNodeType);
+	const edgeColor = useMemo(() => getEdgeColor(sourceNodeType), [sourceNodeType]);
 
 	// Use smoothstep for cleaner, more organized paths
 	const [edgePath, labelX, labelY] = getSmoothStepPath({

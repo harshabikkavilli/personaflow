@@ -1,10 +1,7 @@
 import {useSetAtom, useAtom, useAtomValue} from 'jotai';
-import {useMemo} from 'react';
 import {useNavigate} from 'react-router-dom';
 import {loadGraphAtom} from '../atoms/graphAtoms';
 import {
-	examplesFilteredAtom,
-	examplesCurrentPageAtom,
 	examplesSortByAtom,
 	selectedTemplateModalAtom
 } from '../atoms/examplesAtoms';
@@ -13,27 +10,15 @@ import {ExamplesPagination} from '../components/examples/ExamplesPagination';
 import {ExamplesSidebar} from '../components/examples/ExamplesSidebar';
 import {TemplateCard} from '../components/examples/TemplateCard';
 import {TemplateDetailsModal} from '../components/examples/TemplateDetailsModal';
+import {usePagination} from '../hooks/usePagination';
 import {examples} from '../data/examples';
-
-const ITEMS_PER_PAGE = 6;
 
 export function ExamplesPage() {
 	const navigate = useNavigate();
 	const loadGraph = useSetAtom(loadGraphAtom);
-	const filteredExamples = useAtomValue(examplesFilteredAtom);
-	const [currentPage] = useAtom(examplesCurrentPageAtom);
 	const [sortBy, setSortBy] = useAtom(examplesSortByAtom);
 	const selectedTemplate = useAtomValue(selectedTemplateModalAtom);
-
-	// Pagination
-	const paginatedExamples = useMemo(
-		() =>
-			filteredExamples.slice(
-				(currentPage - 1) * ITEMS_PER_PAGE,
-				currentPage * ITEMS_PER_PAGE
-			),
-		[filteredExamples, currentPage]
-	);
+	const {paginatedExamples} = usePagination();
 
 	const handleOpenInEditor = (example: typeof examples[number]) => {
 		if (example.nodes.length > 0) {
