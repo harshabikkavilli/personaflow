@@ -53,7 +53,7 @@ export function EditableField({
 		return (
 			<input
 				ref={inputRef as React.RefObject<HTMLInputElement>}
-				type="text"
+				type='text'
 				value={editedValue}
 				onChange={(e) => setValue(e.target.value)}
 				onBlur={handleBlur}
@@ -70,8 +70,8 @@ export function EditableField({
 		<div
 			onDoubleClick={startEditing}
 			className={`cursor-text hover:bg-[var(--pf-bg-tertiary)] rounded transition-colors ${displayClassName} ${className}`}
-			title="Double-click to edit">
-			{value || placeholder || 'Double-click to edit...'}
+			title='Double-click to edit'>
+			{value || placeholder}
 		</div>
 	);
 }
